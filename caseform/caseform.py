@@ -1,25 +1,17 @@
 from inflection import camelize, underscore
 
-TRANSFORM_NAMES = ["camelize", "underscore"]
-TRANSFORM_CALLABLES = [camelize, underscore]
+from config.settings import TRANSFORM_CALLABLES
+from config.messages import invalid_transform_message
 
-
-def invalid_transform_message():
-	"""Return invalid transform argument message."""
-	message = "transform argument not in "
-	for name in TRANSFORM_NAMES:
-		message += "{} ".format(name)
-	return message
-
-def transform(mapping, transform, *args, **kwargs):
-	"""Transform mapping to specified key case transformation."""
+def transform(mapping, func, *args, **kwargs):
+	"""Transform mapping to specified key case via func transformation callable."""
 	try:	
-		if transform not in TRANSFORM_CALLABLES:
+		if func not in TRANSFORM_CALLABLES:
 			raise ValueError(invalid_transform_message())
 
 		_mapping = dict()
 		for key, value in mapping.items():
-			trans_key = transform(key, *args, **kwargs)
+			trans_key = func(key, *args, **kwargs)
 			_mapping[trans_key] = value
 		mapping = _mapping
 
